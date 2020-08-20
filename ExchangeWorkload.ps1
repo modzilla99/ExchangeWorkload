@@ -29,7 +29,7 @@ configuration InstallAndConfigureExchange
 	Import-DscResource -ModuleName xDisk;
 	Import-DscResource -ModuleName xDownloadFile;
 	Import-DscResource -ModuleName xDownloadISO;
-    	Import-DscResource -ModuleName xExchange;
+    Import-DscResource -ModuleName xExchange;
 	Import-DscResource -ModuleName xExchangeValidate;
 	Import-DscResource -ModuleName xExtract;
 	Import-DscResource -ModuleName xInstaller;
@@ -327,8 +327,7 @@ configuration InstallAndConfigureExchange
         }
 		
 
- # Download Visual C++ Redistributable Packages for Visual Studio 2013 Download
-        
+		# Download Visual C++ Redistributable Packages for Visual Studio 2013 Download
         xDownloadFile Downloadvcredistx64
 		{
 			SourcePath = "https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe"
@@ -381,13 +380,13 @@ configuration InstallAndConfigureExchange
         DependsOn = '[xADOrganizationalUnit]BranchKiel'
         }
 
-         xADOrganizationalUnit BranchGroupKiel {
+        xADOrganizationalUnit BranchGroupKiel {
         Name = 'Groups'
         Path = "ou=kiel,ou=Branch,ou=$Company,dc=$domain,dc=$tld"
         DependsOn = '[xADOrganizationalUnit]BranchKiel'
         }
 
-         xADOrganizationalUnit BranchComputerKiel {
+        xADOrganizationalUnit BranchComputerKiel {
         Name = 'Computers'
         Path = "ou=kiel,ou=Branch,ou=$Company,dc=$domain,dc=$tld"
         DependsOn = '[xADOrganizationalUnit]BranchKiel'
@@ -408,21 +407,49 @@ configuration InstallAndConfigureExchange
         DependsOn = '[xADOrganizationalUnit]BranchHamburg'
         }
 
-         xADOrganizationalUnit BranchGroupHamburg {
+        xADOrganizationalUnit BranchGroupHamburg {
         Name = 'Groups'
         Path = "ou=Hamburg,ou=Branch,ou=$Company,dc=$domain,dc=$tld"
         DependsOn = '[xADOrganizationalUnit]BranchHamburg'
         }
 
-         xADOrganizationalUnit BranchComputerHamburg {
+        xADOrganizationalUnit BranchComputerHamburg {
         Name = 'Computers'
         Path = "ou=Hamburg,ou=Branch,ou=$Company,dc=$domain,dc=$tld"
         DependsOn = '[xADOrganizationalUnit]BranchHamburg'
         }
 
+        #Create Branch Lübeck
+        xADOrganizationalUnit BranchLübeck
+        {
+        Name = 'Lübeck'
+        Path = "ou=branch,ou=$Company,dc=$domain,dc=$tld"
+        DependsOn = '[xADOrganizationalUnit]Branch'
+        }
+
+
+        xADOrganizationalUnit BranchUserLübeck {
+        Name = 'Users'
+        Path = "ou=Lübeck,ou=Branch,ou=$Company,dc=$domain,dc=$tld"
+        DependsOn = '[xADOrganizationalUnit]BranchLübeck'
+        }
+
+         xADOrganizationalUnit BranchGroupLübeck {
+        Name = 'Groups'
+        Path = "ou=Lübeck,ou=Branch,ou=$Company,dc=$domain,dc=$tld"
+        DependsOn = '[xADOrganizationalUnit]BranchLübeck'
+        }
+
+        xADOrganizationalUnit BranchComputerLübeck {
+        Name = 'Computers'
+        Path = "ou=Lübeck,ou=Branch,ou=$Company,dc=$domain,dc=$tld"
+        DependsOn = '[xADOrganizationalUnit]BranchLübeck'
+		}
+
+
         #Create Administration OU
 
-         #Create Branch
+        #Create Branch
         xADOrganizationalUnit Administration
         {
         Name = 'Administration'
@@ -444,7 +471,7 @@ configuration InstallAndConfigureExchange
         DependsOn = '[xADOrganizationalUnit]Administration'
         }
 
-         xADOrganizationalUnit Administrationdistributionlists
+        xADOrganizationalUnit Administrationdistributionlists
         {
         Name = 'DistributionLists'
         Path = "ou=Administration,ou=$Company,dc=$domain,dc=$tld"
@@ -460,7 +487,7 @@ configuration InstallAndConfigureExchange
 
 
 
-# Install Exchange 2016 CU1
+		# Install Exchange 2016 CU1
         xExchInstall InstallExchange
         {
             Path = "$exchangeInstallerPath\setup.exe"
