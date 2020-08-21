@@ -19,8 +19,52 @@ configuration InstallAndConfigureExchange
 		[String]$Location,
 
 		[Parameter(Mandatory=$true)]
-		[String]$Company
+		[String]$Company,
+
+		[Parameter(Mandatory=$true)]
+		[String]$SubscriptionID,
+
+		[Parameter(Mandatory=$true)]
+		[String]$TenantID,
+
+		[Parameter(Mandatory=$true)]
+		[String]$AppID,
+
+		[Parameter(Mandatory=$true)]
+		[String]$Password
 	)
+
+	#Information for OU Structure
+	[string]$domain,$tld = $DomainName.split(".")
+
+    $AzParams = @{
+		AZSubscriptionID = $SubscriptionID
+		AZTenantId = $TenantID
+		AZAppUsername = $AppID
+		AZAppPasswordInsecure = $Password
+	}
+
+
+	#Managing prerequisites
+	New-Item -Path C:\Certificates -ItemType Directory -Force
+	Install-Module -Name Posh-ACME -Scope AllUsers -force
+
+	#Obtaining certificates
+	New-PACertificate *.$domain.mustertenant.de -AcceptTOS -DnsPlugin Azure -PluginArgs $azParams 
+
+	#Getting path of the certs
+	$Path = (Get-PACertificate).CertFile  
+	$Path = $Path.Substring(0,$Path.Length - 9) 
+	$Path = "$Path\*.*" 
+
+	#Copying the certificates to the previously created directory
+	Copy-Item -Path $Path -Destination C:\Certificates -Recurse
+
+
+
+
+
+
 
 	$DomainCreds = [System.Management.Automation.PSCredential]$DomainFQDNCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($VMAdminCreds.UserName)", $VMAdminCreds.Password)
 
@@ -41,8 +85,7 @@ configuration InstallAndConfigureExchange
 	$downloadPath = "$env:SystemDrive\DownloadsForDSC";
 	$exchangeInstallerPath = "$env:SystemDrive\InstallerExchange";
 	$diskNumber = 2;
-	#Information for OU Structure
-	[string]$domain,$tld = $DomainName.split(".")
+
 	Node localhost
     {
 		xWaitforDisk Disk2
